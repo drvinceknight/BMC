@@ -40,7 +40,7 @@ def checkBibtex(filename, bibtex_string):
         check = tools.rawInput("Is it correct? [Y/n] ")
     except KeyboardInterrupt:
         sys.exit()
-    except (KeyError, AssertionError):
+    except (KeyError, AssertionError, IndexError):
         check = 'n'
 
     try:
@@ -54,7 +54,8 @@ def checkBibtex(filename, bibtex_string):
             tmpfile.flush()
             subprocess.call([EDITOR, tmpfile.name])
             tmpfile.seek(0)
-            bibtex = BibTexParser(tmpfile.read().decode('utf-8')+"\n")
+            bibtex = BibTexParser(open(tmpfile.name, 'r').read().decode('utf-8')+"\n")
+            print(bibtex)
 
         bibtex = bibtex.get_entry_dict()
         try:
@@ -182,8 +183,15 @@ def addFile(src, filetype, manual, autoconfirm, tag):
         bibtex = bibtex[bibtex_name]
         bibtex_string = tools.parsed2Bibtex(bibtex)
     else:
+#        with tempfile.NamedTemporaryFile(suffix=".tmp") as tmpfile:
+#            tmpfile.write('#Please input bibtex info here')
+#            tmpfile.flush()
+#            subprocess.call([EDITOR, tmpfile.name])
+#            tmpfile.seek(0)
+#            tmpfile = open(tmpfile.name, 'r')
+#            bibtex_string = tmpfile.read().decode('utf-8')+"\n"
+#            tmpfile.close()
         bibtex_string = ''
-
     if not autoconfirm:
         bibtex = checkBibtex(src, bibtex_string)
 
